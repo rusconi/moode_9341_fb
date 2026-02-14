@@ -47,12 +47,16 @@ In the Local Services section of Moode's System Config;
     cd /home/pi/moode_9341_fb
     ```
 
+3. Install the required python libraries
 
+    ```bash
+    sudo apt install python3-watchdog python3-mediafile
+    ```
 
-3. Install python scripts and required libraries
+4. Install python scripts
 
     The install script has 4 steps which can be run/not rub by answering y or n at the appropriate prompt
-    - install required libraries
+    - 
     - install MoodeTFT-FB as a service
     - reboot the RPi
 

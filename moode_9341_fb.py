@@ -23,7 +23,7 @@ import urllib.parse
 __version__ = "0.1.4"
 # --- Configuration ---
 FILE_TO_WATCH = "lcd.txt"  # The specific file to monitor
-DIR_TO_WATCH = "."             # Directory where the file exists
+DIR_TO_WATCH = ".."             # Directory where the file exists
 
 txt_color = (240, 240, 240)
 shd_color = (20, 20, 20)
@@ -258,7 +258,7 @@ def go_display():
             hl_type = int(highlight['type'])
         
 
-    metafile = 'lcd.txt'
+    metafile = '../lcd.txt'
 
     c = 0
     title_top = 105
