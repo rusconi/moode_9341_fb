@@ -7,7 +7,7 @@ Moode now playing on TFT framebuffer (/dev/fb1)
 
 0.1.4 - update for change on moode coverurl
 
-0.2.0 - change oif name to moode_9341_fb
+0.2.0 - change of name to moode_9341_fb
       - updated to run on moode 10.1.0
 
 # Note
@@ -43,8 +43,8 @@ In the Local Services section of Moode's System Config;
 2. Download the scripts
 
     ```bash
-    git clone https://github.com/rusconi/moodetft-fb.git
-    cd /home/pi/moodetft-fb
+    git clone https://github.com/rusconi/moode_9341_fb.git
+    cd /home/pi/moode_9341_fb
     ```
 
 
