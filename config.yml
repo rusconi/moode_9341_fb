@@ -1,0 +1,19 @@
+# version = "0.1.6"
+text:
+  # RGB colour for text
+  red: 256
+  green: 226
+  blue: 66
+
+back:
+  # RGB colour for shadow or outline
+  red: 0
+  green: 0
+  blue: 0
+
+highlight:
+  # Type of highlight
+  # 0 = none
+  # 1 = outline
+  # 2 = shadow
+  type: 1
