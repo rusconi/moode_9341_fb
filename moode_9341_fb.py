@@ -245,7 +245,7 @@ def go_display():
     #txt_cl = (240,240,240)
     #shd_cl = (15,15,15)
     if path.exists(confile):
-        
+        print ('yep')
         with open(confile) as config_file:
             data = yaml.load(config_file, Loader=yaml.FullLoader)
             
