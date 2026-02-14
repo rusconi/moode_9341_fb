@@ -2,10 +2,13 @@
 0.0.1 - initial version for moode 6.5.2
 
 0.0.2 - update for changed location of radio icons
-# moodetft-fb
+# moode_9341_fb
 Moode now playing on TFT framebuffer (/dev/fb1)
 
 0.1.4 - update for change on moode coverurl
+
+0.2.0 - change oif name to moode_9341_fb
+      - updated to run on moode 10.1.0
 
 # Note
 
@@ -23,11 +26,14 @@ The code for the framebuffer (framebuffer.py) is from http://github.com/robertmu
 
     [Here is the HowTo on getting an ILI9341 TFT working as a framebuffer display](https://github.com/rusconi/Raspberry-Pi-TFT-FB1-HowTo)
 
+4. You have git installed on your pi
+
 ## Preparation ##
 
 In the Local Services section of Moode's System Config;
 
-* Ensure 'Metadata file' is on
+* Ensure 'Metadata file' is on : Configure -> Audio -> MPD Options -> Metadata file
+* Ensure 'LCD Updater' is on : Configure -> Peripherals -> MPD Other peripherals -> LCD updater
 
 
 ## Installation ##
