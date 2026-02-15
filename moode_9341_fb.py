@@ -371,8 +371,8 @@ def go_display():
         base_filename = "back"
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         extension = ".png"
-        new_filename = f"{base_filename}_{timestamp}{extension}"
-        buffer.save(new_filename, format='png')
+        #new_filename = f"{base_filename}_{timestamp}{extension}"
+        #buffer.save(new_filename, format='png')
         #count = count + 1
         
         return moode_meta
