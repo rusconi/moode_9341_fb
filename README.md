@@ -55,12 +55,19 @@ In the Local Services section of Moode's System Config;
 
 4. Install python scripts
 
-    The install script has 4 steps which can be run/not rub by answering y or n at the appropriate prompt
-    - 
-    - install MoodeTFT-FB as a service
-    - reboot the RPi
+    Before running the install script, you need to create a moode9341-fb.service file to suit your username.
 
-    The first step is necessary for the python scripts to display on the TFT. Install these for testing.
+    ```bash
+    python create_service.py
+    ```
+
+    ```bash
+        sudo cp moode9341-fb.service /lib/systemd/system/
+        sudo chmod 644 /lib/systemd/system/moode9341-fb.service
+        sudo systemctl daemon-reload
+        sudo systemctl start moode9341-fb.service
+        sudo systemctl status moode9341-fb.service				
+    ```
 
     How to install for testing...
 
@@ -71,18 +78,18 @@ In the Local Services section of Moode's System Config;
     you may have to change permissions on the following files.
     
     ```bash
-    chmod +x fbup.py framebuffer.py install-moode-tft-fb.sh moodetft-fb.sh clear_tftfb.py
+    chmod +x moode_9341_fb.py framebuffer.py install-moode-9341-fb.sh moode9341-fb.sh clear_9341fb.py
     ```
     To test after installing libraries and lcdup.py:
 
     ```bash
-    cd /home/pi/moodetft-fb
-    ./fbup.py
+    cd /home/pi/moode_9341_fb
+    ./moode_9341_fb.py
     ```
 
     If the test is successful and you want the display to start on boot,
     
-    you can run `install-moode-tft-fb.sh` again to install the service and reboot.
+    you can run `install-moode-9341-fb.sh` again to install the service and reboot.
 
  ### Configuration ###
 

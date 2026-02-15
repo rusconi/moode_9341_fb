@@ -18,6 +18,8 @@ import math
 from numpy import mean
 import yaml
 import urllib.parse
+import html
+from datetime import datetime
 
 
 __version__ = "0.1.4"
@@ -31,7 +33,8 @@ hl_type = 2
 
 confile = 'config.yml'
 
-count = 1
+
+
 
 script_path = os.path.dirname(os.path.abspath( __file__ ))
 # set script path as current directory - 
@@ -40,8 +43,12 @@ os.chdir(script_path)
 
 fb = Framebuffer(1)
 buffer = Image.new(mode="RGBA", size=fb.size)
-im1 = Image.open(script_path + '/images/default-cover-v6.jpg')
+start_img = Image.open(script_path + '/images/moode10-320x240.png')
+im1 = Image.open(script_path + '/images/default-cover.png')
 bar_img = Image.open(script_path + '/images/volbar.png').convert('RGBA')
+
+buffer.paste(start_img)
+fb.show(buffer)
 
 font = ImageFont.truetype(script_path + '/fonts/Roboto-Medium.ttf',28)
 v_font = ImageFont.truetype(script_path + '/fonts/Roboto-Medium.ttf',16)
@@ -117,9 +124,11 @@ def getMoodeMetadata(metafile):
         while i < len(nowplayingmeta):
             # traverse list converting to a dictionary
             (key, value) = nowplayingmeta[i].split('=',1)
+            #value = html.unescape(value)
             metaDict[key] = value
             i += 1
-
+        metaDict['artist'] = html.unescape(metaDict['artist'])
+        metaDict['title'] = html.unescape(metaDict['title'])
         metaDict['coverurl'] = urllib.parse.unquote(metaDict['coverurl'])
         
         metaDict['source'] = 'library'
@@ -149,14 +158,14 @@ def getMoodeMetadata(metafile):
 def get_cover(metaDict):
 
     cover = None
-    cover = Image.open(script_path + '/images/default-cover-v6.jpg')
+    cover = Image.open(script_path + '/images/default-cover.png')
     covers = ['Cover.jpg', 'cover.jpg', 'Cover.jpeg', 'cover.jpeg', 'Cover.png', 'cover.png', 'Cover.tif', 'cover.tif', 'Cover.tiff', 'cover.tiff',
 		'Folder.jpg', 'folder.jpg', 'Folder.jpeg', 'folder.jpeg', 'Folder.png', 'folder.png', 'Folder.tif', 'folder.tif', 'Folder.tiff', 'folder.tiff']
     if metaDict['source'] == 'radio':
         if 'coverurl' in metaDict:
             rc = '/var/local/www/' + metaDict['coverurl']
             if path.exists(rc):
-                if rc != '/var/www/images/default-cover-v6.svg':
+                if rc != '/var/www/images/default-cover.png':
                     cover = Image.open(rc)
     else:
         if 'file' in metaDict:
@@ -245,7 +254,7 @@ def go_display():
     #txt_cl = (240,240,240)
     #shd_cl = (15,15,15)
     if path.exists(confile):
-        print('confile exists')
+        #print('confile exists')
         with open(confile) as config_file:
             data = yaml.load(config_file, Loader=yaml.FullLoader)
             
@@ -256,10 +265,12 @@ def go_display():
             #bak_col = ImageColor.getrgb(colors['back'])
             highlight = data['highlight']
             hl_type = int(highlight['type'])
-        
+            display = data['display']
+            splash = display['splash']
+         
 
     metafile = '../lcd.txt'
-
+ 
     c = 0
     title_top = 105
     
@@ -275,6 +286,8 @@ def go_display():
         mpd_current = client.currentsong()
                  
         mpd_status = client.status()
+
+        #print(mpd_status)
                
         cover = get_cover(moode_meta)
         vol_w = 264
@@ -348,12 +361,19 @@ def go_display():
            
             #ibar = bar_img.resize((bar_w, 7), Image.LANCZOS)
             #buffer.paste(ibar, (volstart, 226), ibar)
-            
+        if splash == 1:
+            if mpd_status['state'] == 'stop':
+                buffer.paste(start_img)
+
             
         fb.show(buffer)
-
-        #buffer.save("./back"+count+".png", format='png')
-        #count++
+        #count = str(int(count) + 1)
+        base_filename = "back"
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        extension = ".png"
+        new_filename = f"{base_filename}_{timestamp}{extension}"
+        buffer.save(new_filename, format='png')
+        #count = count + 1
         
         return moode_meta
 class SpecificFileHandler(FileSystemEventHandler):

@@ -1,9 +1,9 @@
 # version = "0.1.6"
 text:
   # RGB colour for text
-  red: 256
-  green: 226
-  blue: 66
+  red: 170
+  green: 43
+  blue: 255
 
 back:
   # RGB colour for shadow or outline
@@ -17,3 +17,11 @@ highlight:
   # 1 = outline
   # 2 = shadow
   type: 1
+  
+display:
+  # Whether to leave last payed on display when stopped, or
+  # display splash screen
+  # 0 = leave last played
+  # 1 = display splash
+  splash: 1
+  
