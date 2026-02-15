@@ -31,7 +31,7 @@ hl_type = 2
 
 confile = 'config.yml'
 
-
+count = 1
 
 script_path = os.path.dirname(os.path.abspath( __file__ ))
 # set script path as current directory - 
@@ -116,7 +116,7 @@ def getMoodeMetadata(metafile):
         i = 0
         while i < len(nowplayingmeta):
             # traverse list converting to a dictionary
-            (key, value) = nowplayingmeta[i].split('=')
+            (key, value) = nowplayingmeta[i].split('=',1)
             metaDict[key] = value
             i += 1
 
@@ -245,7 +245,7 @@ def go_display():
     #txt_cl = (240,240,240)
     #shd_cl = (15,15,15)
     if path.exists(confile):
-        print ('yep')
+        print('confile exists')
         with open(confile) as config_file:
             data = yaml.load(config_file, Loader=yaml.FullLoader)
             
@@ -343,7 +343,7 @@ def go_display():
             
             draw.rectangle((45,224,315,234  ), fill=None, outline=txt_col)
             draw.rectangle((46,225,bar_w+48,233), fill=bak_col)
-            draw.rectangle((48,227,bar_w+46,231), fill=txt_col, outline=txt_col)
+            #draw.rectangle((48,227,bar_w+46,231), fill=txt_col, outline=txt_col)
 
            
             #ibar = bar_img.resize((bar_w, 7), Image.LANCZOS)
@@ -352,7 +352,8 @@ def go_display():
             
         fb.show(buffer)
 
-        #buffer.save("/home/pi/back.png", format='png')
+        #buffer.save("./back"+count+".png", format='png')
+        #count++
         
         return moode_meta
 class SpecificFileHandler(FileSystemEventHandler):
