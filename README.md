@@ -65,15 +65,23 @@ In the Local Services section of Moode's System Config;
    
       [Unit]
       Description=Moode 9341 Framebuffer Display
+   
       After=mpd.socket mpd.service
 
+
       [Service]
+   
       Type=idle
+   
       User=root
+   
       ExecStart=/usr/bin/python3 /home/[!USER_NAME]/moode_9341_fb/moode_9341_fb.py
+   
       Restart=always # Restart if it fails
+   
 
       [Install]
+   
       WantedBy=multi-user.target # Standard target for normal boot   Set the shell scripts t executable:
 
    ```bash
