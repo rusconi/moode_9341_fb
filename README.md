@@ -60,10 +60,9 @@ In the Local Services section of Moode's System Config;
     ```bash
     python create_service.py
     ```
-This will create the file moode9341-fb.service to match your username setup.
-It will look something like this
+    This will create the file moode9341-fb.service to match your username setup.
+    It will look something like this
 
-      ```bash
       [Unit]
       Description=Moode 9341 Framebuffer Display
       After=mpd.socket mpd.service
@@ -76,39 +75,22 @@ It will look something like this
       
       [Install]
       WantedBy=multi-user.target # Standard target for normal boot
-      ```
 
+   Set the shell scripts t executable:
 
-    ```bash
-        sudo cp moode9341-fb.service /lib/systemd/system/
-        sudo chmod 644 /lib/systemd/system/moode9341-fb.service
-        sudo systemctl daemon-reload
-        sudo systemctl start moode9341-fb.service
-        sudo systemctl status moode9341-fb.service				
-    ```
-
-    How to install for testing...
-
-    ![Image of Terminal](images/inst-term.png)
-
-    ### Testing ###
-
-    you may have to change permissions on the following files.
-    
-    ```bash
+   ```bash
     chmod +x moode_9341_fb.py framebuffer.py install-moode-9341-fb.sh moode9341-fb.sh clear_9341fb.py
-    ```
-    To test after installing libraries and lcdup.py:
+   ```
+
+
+    run the servce install script. This will install, prepare, and start the service
 
     ```bash
-    cd /home/pi/moode_9341_fb
-    ./moode_9341_fb.py
+    ./install-moode-9341-fb.sh
     ```
 
-    If the test is successful and you want the display to start on boot,
-    
-    you can run `install-moode-9341-fb.sh` again to install the service and reboot.
 
+    
  ### Configuration ###
 
  The text display configuration is in the file config.yml
