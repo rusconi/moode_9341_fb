@@ -62,7 +62,8 @@ In the Local Services section of Moode's System Config;
     ```
     This will create the file moode9341-fb.service to match your username setup.
     It will look something like this
-
+   
+    ```bash
       [Unit]
       Description=Moode 9341 Framebuffer Display
       After=mpd.socket mpd.service
@@ -75,7 +76,8 @@ In the Local Services section of Moode's System Config;
       
       [Install]
       WantedBy=multi-user.target # Standard target for normal boot
-
+   ```
+    
    Set the shell scripts t executable:
 
    ```bash
