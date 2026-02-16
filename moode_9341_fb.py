@@ -367,13 +367,16 @@ def go_display():
 
             
         fb.show(buffer)
-        #count = str(int(count) + 1)
+
+    
+        '''
+        # Each change creates a screen dump
         base_filename = "back"
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         extension = ".png"
-        #new_filename = f"{base_filename}_{timestamp}{extension}"
-        #buffer.save(new_filename, format='png')
-        #count = count + 1
+        new_filename = f"{base_filename}_{timestamp}{extension}"
+        buffer.save(new_filename, format='png')
+        '''
         
         return moode_meta
 class SpecificFileHandler(FileSystemEventHandler):
