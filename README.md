@@ -60,6 +60,24 @@ In the Local Services section of Moode's System Config;
     ```bash
     python create_service.py
     ```
+This will create the file moode9341-fb.service to match your username setup.
+It will look something like this
+
+      ```bash
+      [Unit]
+      Description=Moode 9341 Framebuffer Display
+      After=mpd.socket mpd.service
+      
+      [Service]
+      Type=idle
+      User=root
+      ExecStart=/usr/bin/python3 /home/[your username]/moode_9341_fb/moode_9341_fb.py
+      Restart=always # Restart if it fails
+      
+      [Install]
+      WantedBy=multi-user.target # Standard target for normal boot
+      ```
+
 
     ```bash
         sudo cp moode9341-fb.service /lib/systemd/system/
