@@ -402,6 +402,8 @@ async def close():
 if __name__ == '__main__':
     '''
     if not os.path.exists(FILE_TO_WATCH):
+    
+    if not os.path.exists("../" + FILE_TO_WATCH):
         lcd_error_img = Image.open(script_path + '/images/lcd_file_error.png')
         buffer.paste(lcd_error_img)   
         fb.show(buffer)
