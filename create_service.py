@@ -3,8 +3,8 @@ import os
 current_directory = os.getcwd()
 
 first_lines = ["[Unit]\n","Description=Moode 9341 Framebuffer Display\n","After=mpd.socket mpd.service\n","\n","[Service]\n","Type=idle\n","User=root\n"]
-exec_one = "ExecStart=/usr/bin/python3 " + current_directory + "/moode_9341_fb.py\n"
-last_lines = ["Restart=always # Restart if it fails\n","\n","[Install]\n","WantedBy=multi-user.target # Standard target for normal boot"]
+exec_one = "ExecStartPre=/bin/sleep 30\nExecStart=/usr/bin/python3 " + current_directory + "/moode_9341_fb.py\n"
+last_lines = ["Restart=on-failure # Restart if it fails\n","\n","[Install]\n","WantedBy=multi-user.target # Standard target for normal boot"]
 
 with open('moode9341-fb.service', 'w') as f:
     f.writelines(first_lines)

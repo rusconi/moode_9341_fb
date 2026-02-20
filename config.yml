@@ -1,9 +1,9 @@
 # version = "0.1.6"
 text:
   # RGB colour for text
-  red: 170
-  green: 43
-  blue: 255
+  red: 200
+  green: 200
+  blue: 170
 
 back:
   # RGB colour for shadow or outline
@@ -23,5 +23,5 @@ display:
   # display splash screen
   # 0 = leave last played
   # 1 = display splash
-  splash: 1
+  splash: 0
   

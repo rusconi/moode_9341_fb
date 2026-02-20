@@ -378,7 +378,7 @@ def go_display():
         buffer.save(new_filename, format='png')
         '''
         
-        return moode_meta
+        #return moode_meta
 class SpecificFileHandler(FileSystemEventHandler):
     def on_modified(self, event):
         # Check if the modified event is for our specific file
@@ -390,7 +390,8 @@ class SpecificFileHandler(FileSystemEventHandler):
 
 async def main():
     
-    print()  
+    print("here")  
+    moode_meta = go_display()
     #    moode_meta = go_display()
         
 async def close():
@@ -399,12 +400,12 @@ async def close():
     await asyncio.sleep(1)
 
 if __name__ == '__main__':
-    
+    '''
     if not os.path.exists(FILE_TO_WATCH):
         lcd_error_img = Image.open(script_path + '/images/lcd_file_error.png')
         buffer.paste(lcd_error_img)   
         fb.show(buffer)
-        '''
+        
             with open(FILE_TO_WATCH, "w") as f:
                 f.write("Initial content\n")
             print(f"Created {FILE_TO_WATCH}")
@@ -417,7 +418,7 @@ if __name__ == '__main__':
     observer.start()
     
     print(f"Watching for changes in: {FILE_TO_WATCH}...")
-    #moode_meta = go_display()
+    moode_meta = go_display()
 
     try:
         while True:
