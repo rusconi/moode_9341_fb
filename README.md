@@ -77,7 +77,7 @@ In the Local Services section of Moode's System Config;
    
       ExecStart=/usr/bin/python3 /home/[!USER_NAME]/moode_9341_fb/moode_9341_fb.py
    
-      Restart=always # Restart if it fails
+      Restart=on-failure 
    
 
       [Install]
