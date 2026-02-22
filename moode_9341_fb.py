@@ -13,6 +13,7 @@ import os.path
 from os import path
 import RPi.GPIO as GPIO
 from mediafile import MediaFile
+import requests
 from io import BytesIO
 import math
 from numpy import mean
@@ -161,12 +162,17 @@ def get_cover(metaDict):
     cover = Image.open(script_path + '/images/default-cover.png')
     covers = ['Cover.jpg', 'cover.jpg', 'Cover.jpeg', 'cover.jpeg', 'Cover.png', 'cover.png', 'Cover.tif', 'cover.tif', 'Cover.tiff', 'cover.tiff',
 		'Folder.jpg', 'folder.jpg', 'Folder.jpeg', 'folder.jpeg', 'Folder.png', 'folder.png', 'Folder.tif', 'folder.tif', 'Folder.tiff', 'folder.tiff']
-    if metaDict['source'] == 'radio':
-        if 'coverurl' in metaDict:
-            rc = '/var/local/www/' + metaDict['coverurl']
-            if path.exists(rc):
-                if rc != '/var/www/images/default-cover.png':
-                    cover = Image.open(rc)
+    if 'coverurl' in metaDict:
+            if metaDict['coverurl'].startswith('http'):
+                response = requests.get(metaDict['coverurl'])
+                cover = Image.open(BytesIO(response.content)).resize((160,160), Image.LANCZOS)
+                return cover
+            else:
+                rc = '/var/local/www/' + metaDict['coverurl']
+                if path.exists(rc):
+                    if rc != '/var/www/images/default-cover.png':
+                        cover = Image.open(rc).convert("RGBA").resize((160,160), Image.LANCZOS)
+                        return cover
     else:
         if 'file' in metaDict:
             if len(metaDict['file']) > 0:
