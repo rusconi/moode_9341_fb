@@ -21,6 +21,7 @@ import yaml
 import urllib.parse
 import html
 from datetime import datetime
+import pprint
 
 
 __version__ = "0.1.4"
@@ -157,12 +158,13 @@ def getMoodeMetadata(metafile):
 
 
 def get_cover(metaDict):
-
+    
     cover = None
     cover = Image.open(script_path + '/images/default-cover.png')
     covers = ['Cover.jpg', 'cover.jpg', 'Cover.jpeg', 'cover.jpeg', 'Cover.png', 'cover.png', 'Cover.tif', 'cover.tif', 'Cover.tiff', 'cover.tiff',
 		'Folder.jpg', 'folder.jpg', 'Folder.jpeg', 'folder.jpeg', 'Folder.png', 'folder.png', 'Folder.tif', 'folder.tif', 'Folder.tiff', 'folder.tiff']
-    if 'coverurl' in metaDict:
+    if metaDict['source'] == 'radio':
+        if 'coverurl' in metaDict:
             if metaDict['coverurl'].startswith('http'):
                 response = requests.get(metaDict['coverurl'])
                 cover = Image.open(BytesIO(response.content)).resize((160,160), Image.LANCZOS)
@@ -178,8 +180,10 @@ def get_cover(metaDict):
             if len(metaDict['file']) > 0:
 
                 fp = '/var/lib/mpd/music/' + metaDict['file']
+                
                 if path.exists(fp):
-                    mf = MediaFile(fp)                     
+                    mf = MediaFile(fp)   
+                                     
                     if mf.art:
                         cover = Image.open(BytesIO(mf.art))
                         return cover
@@ -375,14 +379,14 @@ def go_display():
         fb.show(buffer)
 
     
-        '''
+        
         # Each change creates a screen dump
-        base_filename = "back"
+        base_filename = "../screendumps/screendump"
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         extension = ".png"
         new_filename = f"{base_filename}_{timestamp}{extension}"
         buffer.save(new_filename, format='png')
-        '''
+        
         
         #return moode_meta
 class SpecificFileHandler(FileSystemEventHandler):
