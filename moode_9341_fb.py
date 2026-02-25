@@ -22,6 +22,7 @@ import urllib.parse
 import html
 from datetime import datetime
 import pprint
+import textwrap
 
 
 __version__ = "0.1.4"
@@ -56,7 +57,6 @@ font = ImageFont.truetype(script_path + '/fonts/Roboto-Medium.ttf',28)
 v_font = ImageFont.truetype(script_path + '/fonts/Roboto-Medium.ttf',16)
 i_font = ImageFont.truetype(script_path + '/fonts/Font Awesome 5 Free-Solid-900.otf',16)
 bi_font = ImageFont.truetype(script_path + '/fonts/Font Awesome 5 Free-Solid-900.otf',128)
-#Font Awesome 5 Free-Solid-900.otf
 
 draw = ImageDraw.Draw(buffer,'RGBA')
 
@@ -196,73 +196,46 @@ def get_cover(metaDict):
                                 return cover
     return cover
 
-def text_in_rect(canvas, text, font, rect, line_spacing=1.1, align='center', color=(240,240,240), shd_color=(0,0,0), hlite=0):
-    width = rect[2] - rect[0]
-    height = rect[3] - rect[1]
-  
-      
-    # Given a rectangle, reflow and scale text to fit, centred
-    while font.size > 0:
-        space_width = font.getbbox(" ")[2]
-        line_height = int(font.size * line_spacing)
-        max_lines = math.floor(height / line_height)
-        lines = []
+def text_to_width (draw, text, font_path, font_size, location, fill_colour, outline_colour):
+    #font2 = ImageFont.truetype(script_path + '/fonts/Roboto-Medium.ttf',28)
+    #draw.text((160, 20), moode_meta['title'], fill=(255, 255, 255), font=font2, stroke_fill=(0,0,0), stroke_width=2, anchor="mm" )
+    #font_size = 32
+    target_width = 310
+    #font_path = font
+    font = ImageFont.truetype(font_path, font_size)
+    # textbbox returns (x_min, y_min, x_max, y_max)
+    text_width = draw.textbbox((0,0), text, font=font)[2]
 
-        # Determine if text can fit at current scale.
-        words = text.split(" ")
+    # Decrease font size until it fits
+    while text_width > target_width and font_size > 12:
+        font_size -= 1
+        #print(font_size)
+        font = ImageFont.truetype(font_path, font_size)
+        text_width = draw.textbbox((0,0), text, font=font)[2]
 
-        while len(lines) < max_lines and len(words) > 0:
-            line = []
+    if font_size == 12:
+        font = ImageFont.truetype(font_path, 16)
+        wrapped_text = textwrap.wrap(text, width=40)
+        #print(wrapped_text)
+        
+        y_text = location[1]
+        for line in wrapped_text:
+            #print (line)
+            left, top, right, bottom = font.getbbox(line)
+            height = bottom - top
+            draw.text((160, y_text), line, font=font, fill=fill_colour,stroke_fill=outline_colour, stroke_width=1, anchor="mm" )
+            y_text += height
 
-            while len(words) > 0 and font.getbbox(" ".join(line + [words[0]]))[2] <= width:
-                line.append(words.pop(0))
-
-            lines.append(" ".join(line))
-
-        if(len(lines)) <= max_lines and len(words) == 0:
-            # Solution is found, render the text.
-            y = int(rect[1] + (height / 2) - (len(lines) * line_height / 2) - (line_height - font.size) / 2)
-
-            bounds = [rect[2], y, rect[0], y + len(lines) * line_height]
-
-            for line in lines:
-                line_width = font.getbbox(line)[2]
-                if align == 'center':
-                    x = int(rect[0] + (width / 2) - (line_width / 2))
-                elif align == 'right':
-                    x = int(rect[0] + width - line_width)
-                elif align == 'left':
-                    x = int(rect[0])
-                            
-                bounds[0] = min(bounds[0], x)
-                bounds[2] = max(bounds[2], x + line_width)
-
-                if hlite == 1:
-                    # text outline
-                    canvas.text((x-1, y), line, font=font, fill=shd_color, align=align)
-                    canvas.text((x+1, y), line, font=font, fill=shd_color, align=align)
-                    canvas.text((x, y-1), line, font=font, fill=shd_color, align=align)
-                    canvas.text((x, y+1), line, font=font, fill=shd_color, align=align)
-                elif hlite == 2:
-                    canvas.text((x-2, y-2), line, font=font, fill=shd_color, align=align)
-                    canvas.text((x-1, y-1), line, font=font, fill=shd_color, align=align)
+        #draw.multiline_text(location, wrapped_text, fill=fill_colour, font=font,stroke_fill=outline_colour, stroke_width=1,  spacing=10, align='center')
+    else:
+        # Draw the text with the final font size
+        draw.text(location, text, fill=fill_colour, stroke_fill=outline_colour, stroke_width=1, font=font, anchor="mm")
 
 
-                # light inner text
-                canvas.text((x, y), line, font=font, fill=color, align=align)
-                y += line_height
-
-            return tuple(bounds)
-
-        font = ImageFont.truetype(font.path, font.size - 1)
 
 
 def go_display():
 
-    #txt_col, bak_col, hl_type = loadConfig(confile)
-    # Read config.yml for user config
-    #txt_cl = (240,240,240)
-    #shd_cl = (15,15,15)
     if path.exists(confile):
         #print('confile exists')
         with open(confile) as config_file:
@@ -273,8 +246,7 @@ def go_display():
             backz = data['back']
             bak_col = (backz['red'], backz['green'], backz['blue'])
             #bak_col = ImageColor.getrgb(colors['back'])
-            highlight = data['highlight']
-            hl_type = int(highlight['type'])
+            
             display = data['display']
             splash = display['splash']
          
@@ -313,14 +285,7 @@ def go_display():
         cb = 1
         mn = mean(im_mean)
 
-        '''if mn > 130:
-            cb = 0.25
-            if mn > 215:
-                cb = 0.5
-            txt_col = (55,55,55)
-        else:
-            txt_col = (200,200,200)'''
-                
+                  
         enhancer = ImageEnhance.Brightness(cover)
             
         back = enhancer.enhance(0.5)
@@ -329,32 +294,33 @@ def go_display():
         buffer.paste(cover.resize((220,220), Image.LANCZOS),(50,10))
         
         if moode_meta['source'] in ['radio', 'library', 'lms']:
-            text_in_rect(draw, moode_meta['title'], font, (10,5,310,60), line_spacing=1.1, color=txt_col, shd_color=bak_col, hlite=hl_type)
-            text_in_rect(draw, moode_meta['artist'], font, (10,70,310,125), line_spacing=1.1, color=txt_col, shd_color=bak_col, hlite=hl_type)
-            text_in_rect(draw, moode_meta['album'], font, (25,130,295,215), line_spacing=1.1, color=txt_col, shd_color=bak_col, hlite=hl_type)
+            font2 = ImageFont.truetype(script_path + '/fonts/Roboto-Medium.ttf',28)
+            text_to_width (draw, moode_meta['title'], script_path + '/fonts/Roboto-Medium.ttf', 32, (160,20), txt_col, bak_col)
+            text_to_width (draw, moode_meta['artist'], script_path + '/fonts/Roboto-Medium.ttf', 32, (160,70), txt_col, bak_col)
+            text_to_width (draw, moode_meta['album'], script_path + '/fonts/Roboto-Medium.ttf', 32, (160,130), txt_col, bak_col)
                
         
         if 'source' in moode_meta:
             if moode_meta['source'] in ['bluetooth', 'airplay', 'spotify']:
-                text_in_rect(draw, source_char[moode_meta['source']], bi_font, (20,80,300,160), line_spacing=1.1, color=txt_col, shd_color=bak_col, hlite=hl_type)
+                text_to_width (draw, source_char[moode_meta['source']], script_path + '/fonts/Font Awesome 5 Free-Solid-900.otf', 128, (160,20), txt_col, bak_col)
             else:
-                text_in_rect(draw, source_char[moode_meta['source']], i_font, (5,200,55,220), line_spacing=1.1, align='left', color=txt_col, shd_color=bak_col, hlite=hl_type)
-                        
+                text_to_width (draw, source_char[moode_meta['source']], script_path + '/fonts/Font Awesome 5 Free-Solid-900.otf', 16, (25,210), txt_col, bak_col)
+                         
             if  moode_meta['source'] == 'library':
-                text_in_rect(draw, music, i_font, (3,152,22,172), line_spacing=1.1, color=(txt_col), shd_color=(bak_col), hlite=hl_type)
-                text_in_rect(draw, moode_meta['track'], v_font, (3,175,22,195), line_spacing=1.1, color=txt_col, shd_color=bak_col, hlite=hl_type)
-                text_in_rect(draw, cd, i_font, (298,152,317,172), line_spacing=1.1, color=txt_col, shd_color=bak_col, hlite=hl_type)
-                text_in_rect(draw, mpd_status['playlistlength'], v_font, (298,175,317,195), line_spacing=1.1, color=txt_col, shd_color=bak_col, hlite=hl_type)
-                
+                text_to_width (draw, music, script_path + '/fonts/Font Awesome 5 Free-Solid-900.otf', 16, (25,160), txt_col, bak_col)
+                text_to_width (draw, moode_meta['track'], script_path + '/fonts/Roboto-Medium.ttf', 16, (25,185), txt_col, bak_col)
+                text_to_width (draw, cd, script_path + '/fonts/Font Awesome 5 Free-Solid-900.otf', 16, (300,160), txt_col, bak_col)
+                text_to_width (draw, mpd_status['playlistlength'], script_path + '/fonts/Roboto-Medium.ttf', 16, (300,185), txt_col, bak_col)
+                 
         if 'state' in moode_meta:
             if moode_meta['state'] == 'pause':
-                text_in_rect(draw, '\uf04c', i_font, (300,200,320,220), line_spacing=1.1, align='left', color=txt_col, shd_color=bak_col, hlite=hl_type)
+                text_to_width (draw, '\uf04c', script_path + '/fonts/Font Awesome 5 Free-Solid-900.otf', 16, (300,210), txt_col, bak_col)
                 
             elif moode_meta['state'] == 'play':
-                text_in_rect(draw, '\uf04b', i_font, (300,200,320,220), line_spacing=1.1, align='left', color=txt_col, shd_color=bak_col, hlite=hl_type)
+                text_to_width (draw, '\uf04b', script_path + '/fonts/Font Awesome 5 Free-Solid-900.otf', 16, (300,210), txt_col, bak_col)
                 
             elif moode_meta['state'] == 'stop':
-                text_in_rect(draw, '\uf04d', i_font, (300,200,320,220), line_spacing=1.1, align='left', color=txt_col, shd_color=bak_col, hlite=hl_type)
+                text_to_width (draw, '\uf04d', script_path + '/fonts/Font Awesome 5 Free-Solid-900.otf', 16, (300,210), txt_col, bak_col)
                 
         if 'volume' in moode_meta:
             c_vol = int(moode_meta['volume'])
@@ -362,31 +328,17 @@ def go_display():
             if bar_w < 1:
                 bar_w = 1
                 
-            text_in_rect(draw, 'VOL:', v_font, (5,220,65,240), line_spacing=1.1, align='left', color=txt_col, shd_color=bak_col, hlite=hl_type)
+            text_to_width (draw, 'VOL:', script_path + '/fonts/Font Awesome 5 Free-Solid-900.otf', 16, (25,230), txt_col, bak_col)
             
             draw.rectangle((45,224,315,234  ), fill=None, outline=txt_col)
-            draw.rectangle((46,225,bar_w+48,233), fill=bak_col)
-            #draw.rectangle((48,227,bar_w+46,231), fill=txt_col, outline=txt_col)
-
-           
-            #ibar = bar_img.resize((bar_w, 7), Image.LANCZOS)
-            #buffer.paste(ibar, (volstart, 226), ibar)
+            draw.rectangle((46,225,bar_w+48,233), fill=txt_col)
+            
         if splash == 1:
             if mpd_status['state'] == 'stop':
                 buffer.paste(start_img)
 
             
         fb.show(buffer)
-
-    
-        
-        # Each change creates a screen dump
-        base_filename = "../screendumps/screendump"
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        extension = ".png"
-        new_filename = f"{base_filename}_{timestamp}{extension}"
-        buffer.save(new_filename, format='png')
-        
         
         #return moode_meta
 class SpecificFileHandler(FileSystemEventHandler):
@@ -400,7 +352,7 @@ class SpecificFileHandler(FileSystemEventHandler):
 
 async def main():
     
-    print("here")  
+    #print("here")  
     moode_meta = go_display()
     #    moode_meta = go_display()
         
@@ -410,26 +362,14 @@ async def close():
     await asyncio.sleep(1)
 
 if __name__ == '__main__':
-    '''
-    if not os.path.exists(FILE_TO_WATCH):
     
-    if not os.path.exists("../" + FILE_TO_WATCH):
-        lcd_error_img = Image.open(script_path + '/images/lcd_file_error.png')
-        buffer.paste(lcd_error_img)   
-        fb.show(buffer)
-        
-            with open(FILE_TO_WATCH, "w") as f:
-                f.write("Initial content\n")
-            print(f"Created {FILE_TO_WATCH}")
-        '''
-
     event_handler = SpecificFileHandler()
     observer = Observer()
     # Watch the directory for changes
     observer.schedule(event_handler, DIR_TO_WATCH, recursive=False)
     observer.start()
     
-    print(f"Watching for changes in: {FILE_TO_WATCH}...")
+    #print(f"Watching for changes in: {FILE_TO_WATCH}...")
     moode_meta = go_display()
 
     try:

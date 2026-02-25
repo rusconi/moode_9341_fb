@@ -1,22 +1,15 @@
 # version = "0.1.6"
 text:
   # RGB colour for text
-  red: 200
+  red: 255
   green: 200
-  blue: 170
+  blue: 55
 
 back:
   # RGB colour for shadow or outline
   red: 0
   green: 0
   blue: 0
-
-highlight:
-  # Type of highlight
-  # 0 = none
-  # 1 = outline
-  # 2 = shadow
-  type: 1
   
 display:
   # Whether to leave last payed on display when stopped, or
