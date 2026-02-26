@@ -1,9 +1,9 @@
 # version = "0.1.6"
 text:
   # RGB colour for text
-  red: 255
+  red: 200
   green: 200
-  blue: 55
+  blue: 200
 
 back:
   # RGB colour for shadow or outline
