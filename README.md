@@ -90,6 +90,20 @@ You can then;
     ls /dev/fb1
     ```
 
+    /dev/fb1 may not exist without a monitor plugged into the HDMi port
+
+    Later on after I unplugged my HDMI monitor a had to edit /boot/firmware/config.txt and comment out the line dtoverlay=vc4-kms-v3d. This was done on a pi 3b.
+
+    i.e. change
+
+    dtoverlay=vc4-kms-v3d
+
+    to
+
+    #dtoverlay=vc4-kms-v3d
+
+    to get the script to display on the TFT
+    
 * get info about fb1
 
     ```bash
