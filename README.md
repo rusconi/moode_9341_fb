@@ -1,14 +1,4 @@
-# versions
 
-0.0.1 - initial version for moode 6.5.2
-
-0.0.2 - update for changed location of radio icons
-
-# moodetft-fb
-
-Moode now playing on TFT framebuffer (/dev/fb1)
-
-0.1.4 - update for change on moode coverurl
 
 # Note
 
