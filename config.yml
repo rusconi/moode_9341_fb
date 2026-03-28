@@ -18,5 +18,5 @@ display:
   # 1 = display splash
   splash: 0
   
-showtext: False
+showtext: True
 textbutton: 26
