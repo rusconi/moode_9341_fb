@@ -55,21 +55,14 @@ else:
 
 
 def load_config(confile):
-    '''
-    {'back': {'blue': 0, 'green': 0, 'red': 0},
- 'display': {'splash': 0},
- 'text': {'blue': 55, 'green': 200, 'red': 255},
- 'textbutton': {'gpio': 26},
- 'texton': {'showtext': True}}
-
-    '''
+    
     x=1
     if path.exists(confile):
         #print('confile exists')
         global data
         with open(confile) as config_file:
             data = yaml.load(config_file, Loader=yaml.FullLoader)
-            pprint(data)
+            #pprint(data)
             
             textz = data['text']
             txt_col = (textz['red'], textz['green'], textz['blue'])
