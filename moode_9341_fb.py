@@ -12,6 +12,7 @@ import os
 import os.path
 from os import path
 import RPi.GPIO as GPIO
+#from gpiozero import Button
 from mediafile import MediaFile
 import requests
 from io import BytesIO
@@ -21,7 +22,7 @@ import yaml
 import urllib.parse
 import html
 from datetime import datetime
-import pprint
+from pprint import pprint
 import textwrap
 
 
@@ -43,8 +44,72 @@ script_path = os.path.dirname(os.path.abspath( __file__ ))
 # set script path as current directory - 
 os.chdir(script_path)
 
+if os.path.exists('/dev/fb1'):
+    fb = Framebuffer(1)
+    #print("/dev/fb1 exists")
+    # You can then proceed with code that uses the framebuffer
+else:
+    fb = Framebuffer(0)
+    #print("/dev/fb1 does not exist")
+    # Handle the case where the device is not available
 
-fb = Framebuffer(1)
+
+def load_config(confile):
+    '''
+    {'back': {'blue': 0, 'green': 0, 'red': 0},
+ 'display': {'splash': 0},
+ 'text': {'blue': 55, 'green': 200, 'red': 255},
+ 'textbutton': {'gpio': 26},
+ 'texton': {'showtext': True}}
+
+    '''
+    x=1
+    if path.exists(confile):
+        #print('confile exists')
+        global data
+        with open(confile) as config_file:
+            data = yaml.load(config_file, Loader=yaml.FullLoader)
+            pprint(data)
+            
+            textz = data['text']
+            txt_col = (textz['red'], textz['green'], textz['blue'])
+            backz = data['back']
+            bak_col = (backz['red'], backz['green'], backz['blue'])
+            #bak_col = ImageColor.getrgb(colors['back'])
+            
+            display = data['display']
+            splash = display['splash']
+            return data
+
+data = load_config(confile)
+
+show_text = data['showtext']
+but_num = data['textbutton']
+
+
+def button_callback(channel):
+    """Function to be called when the button is pressed."""
+    # Change the boolean value when button presses
+    global show_text
+    show_text = not show_text
+    #update display
+    go_display()
+    
+    
+
+
+GPIO.setwarnings(False) # Ignore warning for now
+GPIO.setmode(GPIO.BCM)
+# set gpio 26 (physical pin 37) as button pin
+# this next to physical pin 39 - ground
+BUTTON_PIN = but_num #
+# Set the button pin as an input with an internal pull-up resistor
+GPIO.setup(BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+# Add event detection to the button pin. The function 'toggle_state' is called
+# every time a falling edge is detected (button press when using PUD_UP).
+# bouncetime prevents multiple rapid triggers from a single press.
+GPIO.add_event_detect(BUTTON_PIN, GPIO.FALLING, callback=button_callback, bouncetime=500)
+
 buffer = Image.new(mode="RGBA", size=fb.size)
 start_img = Image.open(script_path + '/images/moode10-320x240.png')
 im1 = Image.open(script_path + '/images/default-cover.png')
@@ -114,7 +179,9 @@ def isServiceActive(service):
 
     return active
 
-
+def change_display():
+    print("Button Pressed")
+    
 def getMoodeMetadata(metafile):
     # Initalise dictionary
     metaDict = {}
@@ -197,6 +264,8 @@ def get_cover(metaDict):
     return cover
 
 def text_to_width (draw, text, font_path, font_size, location, fill_colour, outline_colour):
+    if show_text is not True:
+        return
     #font2 = ImageFont.truetype(script_path + '/fonts/Roboto-Medium.ttf',28)
     #draw.text((160, 20), moode_meta['title'], fill=(255, 255, 255), font=font2, stroke_fill=(0,0,0), stroke_width=2, anchor="mm" )
     #font_size = 32
@@ -235,20 +304,21 @@ def text_to_width (draw, text, font_path, font_size, location, fill_colour, outl
 
 
 def go_display():
-
-    if path.exists(confile):
+    global data
+    '''if path.exists(confile):
         #print('confile exists')
         with open(confile) as config_file:
             data = yaml.load(config_file, Loader=yaml.FullLoader)
+            pprint(data)'''
             
-            textz = data['text']
-            txt_col = (textz['red'], textz['green'], textz['blue'])
-            backz = data['back']
-            bak_col = (backz['red'], backz['green'], backz['blue'])
-            #bak_col = ImageColor.getrgb(colors['back'])
+    textz = data['text']
+    txt_col = (textz['red'], textz['green'], textz['blue'])
+    backz = data['back']
+    bak_col = (backz['red'], backz['green'], backz['blue'])
+    #bak_col = ImageColor.getrgb(colors['back'])
             
-            display = data['display']
-            splash = display['splash']
+    display = data['display']
+    splash = display['splash']
          
 
     metafile = '../lcd.txt'
@@ -329,9 +399,9 @@ def go_display():
                 bar_w = 1
                 
             text_to_width (draw, 'VOL:', script_path + '/fonts/Font Awesome 5 Free-Solid-900.otf', 16, (25,230), txt_col, bak_col)
-            
-            draw.rectangle((45,224,315,234  ), fill=None, outline=txt_col)
-            draw.rectangle((46,225,bar_w+48,233), fill=txt_col)
+            if show_text is True:
+                draw.rectangle((45,224,315,234  ), fill=None, outline=txt_col)
+                draw.rectangle((46,225,bar_w+48,233), fill=txt_col)
             
         if splash == 1:
             if mpd_status['state'] == 'stop':
@@ -341,6 +411,9 @@ def go_display():
         fb.show(buffer)
         
         #return moode_meta
+
+
+
 class SpecificFileHandler(FileSystemEventHandler):
     def on_modified(self, event):
         # Check if the modified event is for our specific file
@@ -377,6 +450,8 @@ if __name__ == '__main__':
             time.sleep(1)
     except KeyboardInterrupt:
         observer.stop()
+        #GPIO.cleanup()
+        print()
     observer.join()
 
     

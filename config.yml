@@ -1,9 +1,9 @@
 # version = "0.1.6"
 text:
   # RGB colour for text
-  red: 200
+  red: 255
   green: 200
-  blue: 200
+  blue: 55
 
 back:
   # RGB colour for shadow or outline
@@ -18,3 +18,5 @@ display:
   # 1 = display splash
   splash: 0
   
+showtext: False
+textbutton: 26

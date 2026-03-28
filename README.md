@@ -1,5 +1,20 @@
 
 
+# update
+
+The option to turn the text display on and off has been added.
+i.e. When text display is off, only the cover art is shown
+
+two nee options hav ebeen added to the config file to srt the startup option for this
+and the GPIO number for adding a momentary pushbutton to toggle the text on/off
+For ease of button connrctionI have made the config defaukt GOIO as 26 as the is physical pin 37 which is next 
+to physical pin 39, which is ground. Of course you can change this to any free GPIO
+
+make sure the correct python libray is installed by running the following
+   ```bash
+      sudo apt install python3-lgpio
+   ```
+
 # Note
 
 The code for the framebuffer (framebuffer.py) is from http://github.com/robertmuth/Pytorinox
