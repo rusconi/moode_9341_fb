@@ -3,7 +3,7 @@ text:
   # RGB colour for text
   red: 255
   green: 200
-  blue: 55
+  blue: 155
 
 back:
   # RGB colour for shadow or outline
@@ -18,5 +18,15 @@ display:
   # 1 = display splash
   splash: 0
   
-showtext: True
-textbutton: 26
+buttons:
+  #declare the gpio pins for button actions
+  #These 4 pins were chosen to prevent conflict with spi and DACs
+  #other pis can be used if there is no conflict
+  #text button loggles text on/off
+  #pause toggles pause/play
+  #next goes to next track if playing from library ot playlist
+  #prev goes to previous track if playing from library ot playlist
+  text: 6
+  pause: 12
+  next: 4
+  prev: 5

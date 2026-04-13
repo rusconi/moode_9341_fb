@@ -72,51 +72,113 @@ def load_config(confile):
             
             display = data['display']
             splash = display['splash']
+
+            
             return data
 
 data = load_config(confile)
 
+
 show_text = data['showtext']
 but_num = data['textbutton']
+buttons = data['buttons']
 
-
-def button_callback(channel):
-    """Function to be called when the button is pressed."""
-    # Change the boolean value when button presses
-    global show_text
-    show_text = not show_text
-    #update display
-    go_display()
-    
-    
-
+txt_b = buttons['text']
+plp_b = buttons['pause']
+nxt_b = buttons['next']
+prv_b = buttons['prev']
 
 GPIO.setwarnings(False) # Ignore warning for now
 GPIO.setmode(GPIO.BCM)
-# set gpio 26 (physical pin 37) as button pin
-# this next to physical pin 39 - ground
-BUTTON_PIN = but_num #
-# Set the button pin as an input with an internal pull-up resistor
-GPIO.setup(BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-# Add event detection to the button pin. The function 'toggle_state' is called
-# every time a falling edge is detected (button press when using PUD_UP).
-# bouncetime prevents multiple rapid triggers from a single press.
-GPIO.add_event_detect(BUTTON_PIN, GPIO.FALLING, callback=button_callback, bouncetime=500)
+BUTTON_PINS = [6, 5, 4, 12]
+for pin in BUTTON_PINS:
+    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    
+
+def button_callback(channel):
+    """
+    This function is called by any button press event.
+    The 'channel' argument identifies the specific pin that was triggered.
+    """
+    if channel == txt_b:
+        #print("Button 1 (Pin 17) was pressed!")
+        # Add specific actions for Button 1 here
+        # Change the boolean value when button presses
+        global show_text
+        show_text = not show_text
+        #update display
+        go_display()
+    else:
+        client = musicpd.MPDClient()   # create client object
+        try:     
+            client.connect()           # use MPD_HOST/MPD_PORT
+        except:
+            pass
+        else:                
+            status = client.status()
+            song = client.currentsong()
+            #pprint(song)
+            source = 'library'
+        if 'file' in song:
+            if (song['file'].find('http://', 0) > -1) or (song['file'].find('https://', 0) > -1):
+                # set radio stream to true
+                source = 'radio'
+            current_state = status.get('state')
+            if channel == plp_b:
+                #print("Button 2 (Pin 27) was pressed!")
+                # Add specific actions for Button 2 here           
+                if current_state == 'play':
+                # Pause playback
+                    client.pause(1)
+                    #print("Playback paused.")
+                elif current_state == 'pause':
+                    client.pause(0)
+                    #print("MPD is already paused.")
+                    # Toggling pause/resume can also be done by calling client.pause(1) or client.pause(0)
+            if source == 'library':
+                if channel == prv_b:
+                    x = 'prev'
+                    #print('prev')
+                    client.previous()
+                elif channel == nxt_b:
+                    x = 'next'
+                    #print('next')
+                    client.next()
+    
+
+
+for pin in BUTTON_PINS:
+    GPIO.add_event_detect(
+        pin, 
+        GPIO.FALLING, # Use FALLING if using PUD_UP, RISING if using PUD_DOWN
+        callback=button_callback, 
+        bouncetime=500 # Debounce time to prevent multiple triggers
+    )
+
 
 buffer = Image.new(mode="RGBA", size=fb.size)
-start_img = Image.open(script_path + '/images/moode10-320x240.png')
+
+scr_width = fb.size[0]
+scr_height = fb.size[1]
+#buffer = Image.new(mode="RGBA", size=(320,240))
+
+offset = 0 - int((fb.size[0] - fb.size[1])/2)
+
+start_img = Image.open(script_path + '/images/moode10-320x240.png') #.resize(fb.size, Image.LANCZOS)
+
 im1 = Image.open(script_path + '/images/default-cover.png')
 bar_img = Image.open(script_path + '/images/volbar.png').convert('RGBA')
-
+start_img = start_img.resize(fb.size, Image.LANCZOS)
 buffer.paste(start_img)
 fb.show(buffer)
 
-font = ImageFont.truetype(script_path + '/fonts/Roboto-Medium.ttf',28)
+font = ImageFont.truetype(script_path + '/fonts/Roboto-Medium.ttf',24)
 v_font = ImageFont.truetype(script_path + '/fonts/Roboto-Medium.ttf',16)
 i_font = ImageFont.truetype(script_path + '/fonts/Font Awesome 5 Free-Solid-900.otf',16)
 bi_font = ImageFont.truetype(script_path + '/fonts/Font Awesome 5 Free-Solid-900.otf',128)
 
-draw = ImageDraw.Draw(buffer,'RGBA')
+back_img = Image.new(mode="RGBA", size=(320, 240))
+draw = ImageDraw.Draw(back_img,'RGBA')
 
 color_but = (127,127,127)
 volume = 47
@@ -144,7 +206,7 @@ voldn  = '\uf027'
 volup  = '\uf028'
 
 source_char = {'bluetooth':'\uf293', 'airplay':'\uf01d', 'spotify' :'\uf1bc', 'lms':'\uf01a', 'library':'\uf00a', 'radio':'\uf3c9'}
-fb.backlight(True)
+#fb.backlight(True)
 
 
 
@@ -172,8 +234,6 @@ def isServiceActive(service):
 
     return active
 
-def change_display():
-    print("Button Pressed")
     
 def getMoodeMetadata(metafile):
     # Initalise dictionary
@@ -189,9 +249,9 @@ def getMoodeMetadata(metafile):
             #value = html.unescape(value)
             metaDict[key] = value
             i += 1
-        metaDict['artist'] = html.unescape(metaDict['artist'])
-        metaDict['title'] = html.unescape(metaDict['title'])
-        metaDict['coverurl'] = urllib.parse.unquote(metaDict['coverurl'])
+        if 'artist' in metaDict: metaDict['artist'] = html.unescape(metaDict['artist'])
+        if 'title' in metaDict: metaDict['title'] = html.unescape(metaDict['title'])
+        if 'coverurl' in metaDict: metaDict['coverurl'] = urllib.parse.unquote(metaDict['coverurl'])
         
         metaDict['source'] = 'library'
         if 'file' in metaDict:
@@ -223,6 +283,7 @@ def get_cover(metaDict):
     cover = Image.open(script_path + '/images/default-cover.png')
     covers = ['Cover.jpg', 'cover.jpg', 'Cover.jpeg', 'cover.jpeg', 'Cover.png', 'cover.png', 'Cover.tif', 'cover.tif', 'Cover.tiff', 'cover.tiff',
 		'Folder.jpg', 'folder.jpg', 'Folder.jpeg', 'folder.jpeg', 'Folder.png', 'folder.png', 'Folder.tif', 'folder.tif', 'Folder.tiff', 'folder.tiff']
+    
     if metaDict['source'] == 'radio':
         if 'coverurl' in metaDict:
             if metaDict['coverurl'].startswith('http'):
@@ -309,7 +370,7 @@ def go_display():
     backz = data['back']
     bak_col = (backz['red'], backz['green'], backz['blue'])
     #bak_col = ImageColor.getrgb(colors['back'])
-            
+    
     display = data['display']
     splash = display['splash']
          
@@ -352,15 +413,15 @@ def go_display():
         enhancer = ImageEnhance.Brightness(cover)
             
         back = enhancer.enhance(0.5)
-        buffer.paste(back.resize((360,360), Image.LANCZOS).filter(ImageFilter.GaussianBlur),(-20,-60))
+        back_img.paste(back.resize((360,360), Image.LANCZOS).filter(ImageFilter.GaussianBlur),(-20,-60))
             
-        buffer.paste(cover.resize((220,220), Image.LANCZOS),(50,10))
+        back_img.paste(cover.resize((220,220), Image.LANCZOS),(50,10))
         
         if moode_meta['source'] in ['radio', 'library', 'lms']:
             font2 = ImageFont.truetype(script_path + '/fonts/Roboto-Medium.ttf',28)
-            text_to_width (draw, moode_meta['title'], script_path + '/fonts/Roboto-Medium.ttf', 32, (160,20), txt_col, bak_col)
-            text_to_width (draw, moode_meta['artist'], script_path + '/fonts/Roboto-Medium.ttf', 32, (160,70), txt_col, bak_col)
-            text_to_width (draw, moode_meta['album'], script_path + '/fonts/Roboto-Medium.ttf', 32, (160,130), txt_col, bak_col)
+            text_to_width (draw, moode_meta['title'], script_path + '/fonts/Roboto-Medium.ttf', 28, (160,20), txt_col, bak_col)
+            text_to_width (draw, moode_meta['artist'], script_path + '/fonts/Roboto-Medium.ttf', 28, (160,70), txt_col, bak_col)
+            text_to_width (draw, moode_meta['album'], script_path + '/fonts/Roboto-Medium.ttf', 28, (160,130), txt_col, bak_col)
                
         
         if 'source' in moode_meta:
@@ -398,8 +459,10 @@ def go_display():
             
         if splash == 1:
             if mpd_status['state'] == 'stop':
-                buffer.paste(start_img)
-
+                back_img.paste(start_img)
+        #temp_img = buffer #
+        temp_img = back_img.resize(fb.size, Image.LANCZOS)
+        buffer.paste(temp_img)
             
         fb.show(buffer)
         
@@ -411,7 +474,7 @@ class SpecificFileHandler(FileSystemEventHandler):
     def on_modified(self, event):
         # Check if the modified event is for our specific file
         if not event.is_directory and event.src_path.endswith(FILE_TO_WATCH):
-            print(f"File Modified: {event.src_path}")
+            #print(f"File Modified: {event.src_path}")
             # Add action here: e.g., read_file(event.src_path)
             #openLcdTxt()
             moode_meta = go_display()
@@ -444,6 +507,7 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         observer.stop()
         #GPIO.cleanup()
+        fb.clear()
         print()
     observer.join()
 

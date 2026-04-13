@@ -2,6 +2,56 @@
 
 # update
 
+The script will now auto adjust to match the display to framebuffer size
+
+The script is designed for displays with a 4:3 aspect ratio with 320x240 as a starting point
+Displays known to work are;
+   2.8" ili9341
+   2.0" ST7789x
+   1.8" ST7735s - this is not exactly 4:3, but ts only a few pixels out
+
+Framebuffers can be created by adding the coorresponding dtoverly line at the end of the /boot/firmware/config.txt file.
+Ensure that spi is turned on by addeng or uncommenting the followung line in /boot/firmware/config.txt
+```bash
+   dtparam=spi=on
+```
+
+The overlays used for testing were:
+
+Thear are built into Raspbian and don't need any extra installation
+
+For 2.8" ili9341 (320x240)
+```bash
+dtoverlay=fbtft,spi0-0,ili9341,reset_pin=17,dc_pin=27,cs=0,led_pin=13,rotate=270,bgr=1
+```
+
+For 2.0" st7789v (320x240) also 1.9" (170x320)
+```bash
+dtoverlay=fbtft,spi0-0,st7789v,reset_pin=17,dc_pin=27,cs=0,led_pin=13,rotate=270
+```
+
+For 1.8" st7735s (160x128)
+```bash
+dtoverlay=fbtft,spi0-0,adafruit18,speed=32000000,reset_pin=17,dc_pin=27,led_pin=13,rotate=270
+```
+
+The option to use up to 4 buttons foe actions has been added
+
+The config.yml file has been updated to allow which gpios are used
+
+The 4 gpios were origanally chosen to prevent pin conflicts
+
+They are
+
+   GPIO 6 - Toggle text on / off
+   GPIO 12 - toggle pause / play
+   GPIO 4 - next track - library only
+   GPIO 5 - previous track - library only
+
+
+
+# prior update
+
 The option to turn the text display on and off has been added.
 i.e. When text display is off, only the cover art is shown
 
@@ -14,6 +64,8 @@ make sure the correct python libray is installed by running the following
    ```bash
       sudo apt install python3-lgpio
    ```
+
+
 
 # Note
 

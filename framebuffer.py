@@ -84,7 +84,7 @@ class Framebuffer(object):
             config_dir + "/bits_per_pixel")[0]
         assert self.stride == self.bits_per_pixel // 8 * self.size[0]
         
-        self.led = LED(13)
+        #self.led = LED(13)
 
     def __str__(self):
         args = (self.path, self.size, self.stride, self.bits_per_pixel)
@@ -104,11 +104,11 @@ class Framebuffer(object):
     def off(self):
         pass
     
-    def backlight(self, light: bool):
+    '''def backlight(self, light: bool):
         if light == True:
             self.led.on()
         else:
-            self.led.off()
+            self.led.off()'''
     
     def clear(self):
         
