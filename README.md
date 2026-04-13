@@ -41,7 +41,21 @@ For 1.8" st7735s (160x128)
 dtoverlay=fbtft,spi0-0,adafruit18,speed=32000000,reset_pin=17,dc_pin=27,led_pin=13,rotate=270
 ```
 
-The option to use up to 4 buttons foe actions has been added
+The pins used for reset, dc and backlight(led) were chosen to avoid pin conflicts with DAC hats.
+If you use these overlays, connect the TFT as follows, otherwise edit the overlay line to suit your pin selection
+
+| Display  |  RPi pin |  GPIO # |
+|-|-|-|
+| VCC | 1 | 3.3v |
+| GND | 6 | gnd |
+| CS | 24 | 8 |
+| RESET | 11 | 17 |
+| DC | 27 | 13 |
+| SDI(MOSI) | 19 | 10 |
+| SCK | 23 | 11 |
+| LED | 33 | 13 |
+
+The option to use up to 4 buttons for certain actions has been added
 
 The config.yml file has been updated to allow which gpios are used
 
