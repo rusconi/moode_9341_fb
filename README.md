@@ -2,6 +2,12 @@
 
 # update
 
+The script will switch back to /dev/fb0 if /dev/fb1 is not created.
+
+Thos may cuse issues if fb0 is too large, or if flashing cursors appear on your screen
+
+The flashing curser can be stopped - google is your friend
+
 The script will now auto adjust to match the display to framebuffer size
 
 The script is designed for displays with a 4:3 aspect ratio with 320x240 as a starting point
