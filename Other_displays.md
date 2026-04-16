@@ -40,7 +40,7 @@ If you use these overlays, connect the TFT as follows, otherwise edit the overla
 | GND | 6 | gnd |
 | CS | 24 | 8 |
 | RESET | 11 | 17 |
-| DC | 27 | 13 |
+| DC | 13 | 27 |
 | SDI(MOSI) | 19 | 10 |
 | SCK | 23 | 11 |
 | LED | 33 | 13 |xx
