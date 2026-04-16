@@ -80,7 +80,7 @@ data = load_config(confile)
 
 
 show_text = True #data['showtext']
-but_num = data['textbutton']
+#but_num = data['textbutton']
 buttons = data['buttons']
 
 txt_b = buttons['text']
