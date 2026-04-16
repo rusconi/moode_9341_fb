@@ -1,4 +1,4 @@
-# ther 320x240 pixel displays and overlays
+# Other 320x240 pixel displays and overlays
 
 The script is designed for displays with a 4:3 aspect ratio with 320x240 as a starting point
 Displays known to work are;
