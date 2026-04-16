@@ -79,7 +79,7 @@ def load_config(confile):
 data = load_config(confile)
 
 
-show_text = data['showtext']
+show_text = True #data['showtext']
 but_num = data['textbutton']
 buttons = data['buttons']
 
