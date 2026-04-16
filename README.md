@@ -1,95 +1,14 @@
 
-
-# update
-
-The script will switch back to /dev/fb0 if /dev/fb1 is not created.
-
-Thos may cuse issues if fb0 is too large, or if flashing cursors appear on your screen
-
-The flashing curser can be stopped - google is your friend
-
-The script will now auto adjust to match the display to framebuffer size
-
-The script is designed for displays with a 4:3 aspect ratio with 320x240 as a starting point
-Displays known to work are;
-   2.8" ili9341
-   2.0" ST7789x
-   1.8" ST7735s - this is not exactly 4:3, but ts only a few pixels out
-
-Framebuffers can be created by adding the coorresponding dtoverly line at the end of the /boot/firmware/config.txt file.
-Ensure that spi is turned on by addeng or uncommenting the followung line in /boot/firmware/config.txt
-```bash
-   dtparam=spi=on
-```
-
-The overlays used for testing were:
-
-Thear are built into Raspbian and don't need any extra installation
-
-For 2.8" ili9341 (320x240)
-```bash
-dtoverlay=fbtft,spi0-0,ili9341,reset_pin=17,dc_pin=27,cs=0,led_pin=13,rotate=270,bgr=1
-```
-
-For 2.0" st7789v (320x240) also 1.9" (170x320)
-```bash
-dtoverlay=fbtft,spi0-0,st7789v,reset_pin=17,dc_pin=27,cs=0,led_pin=13,rotate=270
-```
-
-For 1.8" st7735s (160x128)
-```bash
-dtoverlay=fbtft,spi0-0,adafruit18,speed=32000000,reset_pin=17,dc_pin=27,led_pin=13,rotate=270
-```
-
-The pins used for reset, dc and backlight(led) were chosen to avoid pin conflicts with DAC hats.
-If you use these overlays, connect the TFT as follows, otherwise edit the overlay line to suit your pin selection
-
-| Display  |  RPi pin |  GPIO # |
-|-|-|-|
-| VCC | 1 | 3.3v |
-| GND | 6 | gnd |
-| CS | 24 | 8 |
-| RESET | 11 | 17 |
-| DC | 27 | 13 |
-| SDI(MOSI) | 19 | 10 |
-| SCK | 23 | 11 |
-| LED | 33 | 13 |
-
-The option to use up to 4 buttons for certain actions has been added
-
-The config.yml file has been updated to allow which gpios are used
-
-The 4 gpios were origanally chosen to prevent pin conflicts
-
-They are
-
-   GPIO 6 - Toggle text on / off
-   GPIO 12 - toggle pause / play
-   GPIO 4 - next track - library only
-   GPIO 5 - previous track - library only
-
-
-
-# prior update
-
-The option to turn the text display on and off has been added.
-i.e. When text display is off, only the cover art is shown
-
-two nee options hav ebeen added to the config file to srt the startup option for this
-and the GPIO number for adding a momentary pushbutton to toggle the text on/off
-For ease of button connrctionI have made the config defaukt GOIO as 26 as the is physical pin 37 which is next 
-to physical pin 39, which is ground. Of course you can change this to any free GPIO
-
-make sure the correct python libray is installed by running the following
-   ```bash
-      sudo apt install python3-lgpio
-   ```
-
-
-
 # Note
 
 The code for the framebuffer (framebuffer.py) is from http://github.com/robertmuth/Pytorinox
+
+The script will switch back to /dev/fb0 if /dev/fb1 is not created.
+This may cause issues if fb0 is too large, or if flashing cursors appear on your screen
+
+The script can auto adjust to framebuffers of different sizes.
+This may not look good on displays karger than 320x340 pixels
+
 
 ## Assumptions
 
@@ -99,9 +18,13 @@ The code for the framebuffer (framebuffer.py) is from http://github.com/robertmu
    
     ![Image of Display](https://github.com/rusconi/Raspberry-Pi-TFT-FB1-HowTo/blob/master/images/screen.png)
 
-3. The TFT displays /dev/fb1
+3. The TFT displays /dev/fb1 (or fb0 if fb1 is not available)
    
     [Here is the HowTo on getting an ILI9341 TFT working as a framebuffer display](https://github.com/rusconi/Raspberry-Pi-TFT-FB1-HowTo)
+
+    [Other options for framebuffers are also available.](Other_displays.md)
+
+    Iy doesn't matter which framebuffer method is used as long as you connect the display to the RPI GPOs that maych the overlay file you use.
 
 ## Preparation
 
@@ -196,9 +119,33 @@ In the Other peripherals section of Moode's PeripheralsConfig;
 
         Be aware that the service should not start until mpd is running. this may take         some time.
 
-### Configuration
+## Other Functions and config file
 
-The text display configuration is in the file config.yml
+The option to turn use some pushbuttons been added.
+
+Up to 4 pushbuttons can be added.
+
+Use momentary action switches
+
+The functions these buttons control are:
+
+- Toggle the text display on/off. The coverart is always displayed.
+- Toggle pause/play.
+- Next track
+- Previous track,
+
+The GPIO pins used to connect the buttons to can be edited in the config file (config.yml)
+
+The 4 gpios were origanally chosen to prevent pin conflicts
+
+They are
+
+   GPIO 6 - Toggle text on / off
+   GPIO 12 - toggle pause / play
+   GPIO 4 - next track - library only
+   GPIO 5 - previous track - library only
+
+Text display colors can be changed in the config file as well
 
 Use an online color picker to choose the color you want and the copy the RGB values to the 
 
@@ -208,4 +155,3 @@ You can also change how to highlight text.
 
 0. No highlight
 1. outline
-2. 
