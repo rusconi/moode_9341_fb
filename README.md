@@ -115,9 +115,19 @@ In the Other peripherals section of Moode's PeripheralsConfig;
    
    ```
 
-       The service should now be installed and will start on boot/reboot. 
+   The service should now be installed and will start on boot/reboot. 
 
-        Be aware that the service should not start until mpd is running. this may take         some time.
+   Be aware that the service should not start until mpd is running. this may take some time.
+
+6. Uninstall service
+
+   'uninstall.sh' will stop ond remove the service - no changes occur in the script directory.
+
+   to run
+   ```bash
+   sudo sh uninstall.sh
+   ```
+
 
 ## Other Functions and config file
 
