@@ -435,7 +435,7 @@ def go_display():
             text_to_width (draw, moode_meta.get('artist',' '), script_path + '/fonts/Roboto-Medium.ttf', 28, (160,70), txt_col, bak_col)
             text_to_width (draw, moode_meta.get('album',' '), script_path + '/fonts/Roboto-Medium.ttf', 28, (160,130), txt_col, bak_col)
             if log is True:
-                logdata = moode_meta['title'] + " - " +  moode_meta['artist'] + ' - ' + moode_meta['album'] + ': ' + mpd_status['state']
+                logdata = moode_meta.get('title','#')+ " - " +  moode_meta.get('artist','#') + moode_meta.get('album','#') + ': ' + mpd_status['state']
                 logging.info(logdata)
   
         
