@@ -30,3 +30,9 @@ buttons:
   pause: 12
   next: 4
   prev: 5
+
+# if True each screen update will be appended to the file 'moode_9341_fb.log' in the script directory
+# the format of each change appended is
+# date time: title - artist - album/station: state (play|pause|stop)
+# view the log file with 'cat ~/moode_9341_fb/moode_9341_fb.log'
+log: False

@@ -24,6 +24,7 @@ import html
 from datetime import datetime
 from pprint import pprint
 import textwrap
+import logging
 
 
 __version__ = "0.1.4"
@@ -53,6 +54,14 @@ else:
     #print("/dev/fb1 does not exist")
     # Handle the case where the device is not available
 
+# Configure the logger to save to 'app.log'
+logging.basicConfig(
+    filename='moode_9341_fb.log', 
+    filemode='a', # 'a' for append (default), 'w' for overwrite
+    format='%(asctime)s: %(message)s', #    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    level=logging.INFO
+)
 
 def load_config(confile):
     
@@ -73,7 +82,8 @@ def load_config(confile):
             display = data['display']
             splash = display['splash']
 
-            
+            log = data['log']  
+
             return data
 
 data = load_config(confile)
@@ -87,6 +97,8 @@ txt_b = buttons['text']
 plp_b = buttons['pause']
 nxt_b = buttons['next']
 prv_b = buttons['prev']
+
+log = data['log']
 
 GPIO.setwarnings(False) # Ignore warning for now
 GPIO.setmode(GPIO.BCM)
@@ -419,10 +431,13 @@ def go_display():
         
         if moode_meta['source'] in ['radio', 'library', 'lms']:
             font2 = ImageFont.truetype(script_path + '/fonts/Roboto-Medium.ttf',28)
-            text_to_width (draw, moode_meta['title'], script_path + '/fonts/Roboto-Medium.ttf', 28, (160,20), txt_col, bak_col)
-            text_to_width (draw, moode_meta['artist'], script_path + '/fonts/Roboto-Medium.ttf', 28, (160,70), txt_col, bak_col)
-            text_to_width (draw, moode_meta['album'], script_path + '/fonts/Roboto-Medium.ttf', 28, (160,130), txt_col, bak_col)
-               
+            text_to_width (draw, moode_meta.get('title',' '), script_path + '/fonts/Roboto-Medium.ttf', 28, (160,20), txt_col, bak_col)
+            text_to_width (draw, moode_meta.get('artist',' '), script_path + '/fonts/Roboto-Medium.ttf', 28, (160,70), txt_col, bak_col)
+            text_to_width (draw, moode_meta.get('album',' '), script_path + '/fonts/Roboto-Medium.ttf', 28, (160,130), txt_col, bak_col)
+            if log is True:
+                logdata = moode_meta['title'] + " - " +  moode_meta['artist'] + ' - ' + moode_meta['album'] + ': ' + mpd_status['state']
+                logging.info(logdata)
+  
         
         if 'source' in moode_meta:
             if moode_meta['source'] in ['bluetooth', 'airplay', 'spotify']:
